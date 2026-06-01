@@ -1,116 +1,176 @@
 import React, { useState } from 'react';
 import './DataTable.css';
 
-const DataTable = ({ 
-  title, 
-  columns, 
-  data = [], 
-  onAdd, 
-  onEdit, 
-  onDelete, 
-  searchPlaceholder = "Buscar registros..." 
+const DataTable = ({
+  columns,
+  data,
+  title = '',
+  onNew = null,
+  onEdit = null,
+  onDelete = null,
+  onSave = null,
+  onCalculate = null,
+  onPost = null,
+  customActions = [],
+  loading = false,
+  emptyMessage = 'No hay datos para mostrar',
+  selectable = true,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedIds, setSelectedIds] = useState(new Set());
 
-  const filteredData = data.filter(row => {
-    return Object.values(row).some(val => 
-      String(val).toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
+  const toggleSelectAll = () => {
+    if (selectedIds.size === data.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(data.map(item => item.id)));
+    }
+  };
+
+  const toggleSelect = (id) => {
+    const newSet = new Set(selectedIds);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+    } else {
+      newSet.add(id);
+    }
+    setSelectedIds(newSet);
+  };
+
+  const handleDelete = () => {
+    if (onDelete && selectedIds.size > 0) {
+      onDelete(Array.from(selectedIds));
+      setSelectedIds(new Set());
+    }
+  };
+
+  const selectedCount = selectedIds.size;
 
   return (
-    <div className="data-table-container card">
-      <div className="table-header flex justify-between align-center gap-md">
-        <div className="table-title-group">
-          <h3>{title}</h3>
-          <span className="table-count">{filteredData.length} registros</span>
+    <div className="datatable-container">
+      {/* Toolbar */}
+      <div className="datatable-toolbar">
+        <div className="toolbar-left">
+          {title && <h3 className="datatable-title">{title}</h3>}
         </div>
-        
-        <div className="table-actions flex align-center gap-sm">
-          <input 
-            type="text" 
-            placeholder={searchPlaceholder} 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-          {onAdd && (
-            <button className="btn btn-primary flex align-center gap-sm" onClick={onAdd}>
-              <span className="btn-icon">➕</span>
-              <span>Nuevo</span>
+        <div className="toolbar-right">
+          {onNew && (
+            <button className="btn btn-primary" onClick={onNew}>
+              <span>+</span> New
             </button>
           )}
+          {onEdit && selectedCount === 1 && (
+            <button className="btn btn-secondary" onClick={() => onEdit(Array.from(selectedIds)[0])}>
+              ✏️ Edit
+            </button>
+          )}
+          {onDelete && (
+            <button
+              className="btn btn-secondary"
+              onClick={handleDelete}
+              disabled={selectedCount === 0}
+            >
+              🗑️ Delete {selectedCount > 0 && `(${selectedCount})`}
+            </button>
+          )}
+          {onSave && (
+            <button className="btn btn-secondary" onClick={onSave}>
+              💾 Save
+            </button>
+          )}
+          {onCalculate && (
+            <button className="btn btn-secondary" onClick={onCalculate}>
+              🧮 Calculate
+            </button>
+          )}
+          {onPost && (
+            <button className="btn btn-secondary" onClick={onPost}>
+              📤 Post
+            </button>
+          )}
+          {customActions.map((action, i) => (
+            <button
+              key={i}
+              className={`btn ${action.variant || 'btn-secondary'}`}
+              onClick={() => action.onClick(selectedIds)}
+            >
+              {action.icon && <span>{action.icon}</span>}
+              {action.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="table-wrapper">
-        <table className="data-table">
-          <thead>
-            <tr>
-              {columns.map((col, index) => (
-                <th key={index} style={{ width: col.width || 'auto' }}>
-                  {col.header}
-                </th>
-              ))}
-              {(onEdit || onDelete) && <th style={{ width: '120px', textAlign: 'center' }}>Acciones</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.length > 0 ? (
-              filteredData.map((row, rowIndex) => (
-                <tr key={row.id || rowIndex}>
-                  {columns.map((col, colIndex) => {
-                    const value = row[col.accessor];
-                    return (
-                      <td key={colIndex}>
-                        {col.cell ? col.cell(row) : (
-                          typeof value === 'number' && col.type === 'currency' 
-                            ? `$${value.toLocaleString('es-BO', { minimumFractionDigits: 2 })}`
-                            : String(value ?? '')
-                        )}
-                      </td>
-                    );
-                  })}
-                  {(onEdit || onDelete) && (
-                    <td className="actions-cell">
-                      <div className="actions-group flex justify-center gap-sm">
-                        {onEdit && (
-                          <button 
-                            className="btn-icon-only edit" 
-                            title="Editar"
-                            onClick={() => onEdit(row)}
-                          >
-                            ✏️
-                          </button>
-                        )}
-                        {onDelete && (
-                          <button 
-                            className="btn-icon-only delete" 
-                            title="Eliminar"
-                            onClick={() => {
-                              if (window.confirm("¿Está seguro de que desea eliminar este registro?")) {
-                                onDelete(row.id);
-                              }
-                            }}
-                          >
-                            🗑️
-                          </button>
-                        )}
-                      </div>
+      {/* Tabla */}
+      {loading ? (
+        <div className="datatable-loading">
+          <div className="loading-spinner"></div>
+          <p>Cargando datos...</p>
+        </div>
+      ) : data.length === 0 ? (
+        <div className="datatable-empty">
+          <span className="empty-icon">📋</span>
+          <p>{emptyMessage}</p>
+        </div>
+      ) : (
+        <div className="datatable-wrapper">
+          <table className="datatable">
+            <thead>
+              <tr>
+                {selectable && (
+                  <th className="th-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={data.length > 0 && selectedIds.size === data.length}
+                      onChange={toggleSelectAll}
+                    />
+                  </th>
+                )}
+                {columns.map((col) => (
+                  <th key={col.key} style={col.width ? { width: col.width } : {}}>
+                    {col.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((row, idx) => (
+                <tr
+                  key={row.id || idx}
+                  className={selectedIds.has(row.id) ? 'selected' : ''}
+                  onDoubleClick={() => onEdit && onEdit(row.id)}
+                >
+                  {selectable && (
+                    <td className="td-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(row.id)}
+                        onChange={() => toggleSelect(row.id)}
+                      />
                     </td>
                   )}
+                  {columns.map((col) => (
+                    <td key={col.key}>
+                      {col.render ? col.render(row[col.key], row) : row[col.key]}
+                    </td>
+                  ))}
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={columns.length + ((onEdit || onDelete) ? 1 : 0)} className="no-data text-center">
-                  No se encontraron registros.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Footer con info */}
+      {data.length > 0 && (
+        <div className="datatable-footer">
+          <span className="row-count">
+            {data.length} {data.length === 1 ? 'registro' : 'registros'}
+          </span>
+          {selectedCount > 0 && (
+            <span className="selection-info">{selectedCount} seleccionado(s)</span>
+          )}
+        </div>
+      )}
     </div>
   );
 };

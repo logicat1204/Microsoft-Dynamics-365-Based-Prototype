@@ -1,6 +1,8 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Sidebar from './components/Sidebar';
+import TopBar from './components/TopBar';
 import Home from './pages/Home';
 import Finance from './pages/Finance';
 import SupplyChain from './pages/SupplyChain';
@@ -8,56 +10,94 @@ import Commerce from './pages/Commerce';
 import ProjectOps from './pages/ProjectOps';
 import HumanResources from './pages/HumanResources';
 import BusinessCentral from './pages/BusinessCentral';
+import Login from './pages/Login';
 import './App.css';
+
+// Componente para proteger rutas - redirige al login si no hay usuario autenticado
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-spinner"></div>
+        <p>Cargando...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+// Layout principal con Sidebar y TopBar
+const MainLayout = ({ children }) => {
+  return (
+    <div className="app-container">
+      <Sidebar />
+      <div className="main-content">
+        <TopBar />
+        <main className="page-viewport">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
 
 function App() {
   return (
-    <Router>
-      <div className="app-container">
-        {/* Navigation Sidebar */}
-        <Sidebar />
+    <AuthProvider>
+      <Router>
+        <Routes>
+          {/* Ruta de Login (sin layout) */}
+          <Route path="/login" element={<Login />} />
 
-        {/* Main Content Workspace */}
-        <div className="main-content">
-          
-          {/* Top Corporate Navbar */}
-          <header className="navbar flex align-center justify-between">
-            <div className="nav-left flex align-center gap-sm">
-              <span>Microsoft Dynamics 365</span>
-              <span>/</span>
-              <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Entorno de Producción</span>
-            </div>
-            
-            <div className="nav-right">
-              <div className="user-profile">
-                <div className="user-avatar flex align-center justify-center">
-                  <span>AD</span>
-                </div>
-                <div className="user-info">
-                  <span className="user-name">Administrador ERP</span>
-                  <span className="user-role">SIS315 - Admin</span>
-                </div>
-              </div>
-            </div>
-          </header>
+          {/* Rutas protegidas (con layout principal) */}
+          <Route path="/" element={
+            <ProtectedRoute>
+              <MainLayout><Home /></MainLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/finance" element={
+            <ProtectedRoute>
+              <MainLayout><Finance /></MainLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/supplychain" element={
+            <ProtectedRoute>
+              <MainLayout><SupplyChain /></MainLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/commerce" element={
+            <ProtectedRoute>
+              <MainLayout><Commerce /></MainLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/project" element={
+            <ProtectedRoute>
+              <MainLayout><ProjectOps /></MainLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/hr" element={
+            <ProtectedRoute>
+              <MainLayout><HumanResources /></MainLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/businesscentral" element={
+            <ProtectedRoute>
+              <MainLayout><BusinessCentral /></MainLayout>
+            </ProtectedRoute>
+          } />
 
-          {/* Dynamic Router Viewport */}
-          <main className="page-viewport">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/finance" element={<Finance />} />
-              <Route path="/supplychain" element={<SupplyChain />} />
-              <Route path="/commerce" element={<Commerce />} />
-              <Route path="/project" element={<ProjectOps />} />
-              <Route path="/hr" element={<HumanResources />} />
-              <Route path="/businesscentral" element={<BusinessCentral />} />
-              <Route path="*" element={<Home />} />
-            </Routes>
-          </main>
-
-        </div>
-      </div>
-    </Router>
+          {/* Ruta catch-all - redirige al home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

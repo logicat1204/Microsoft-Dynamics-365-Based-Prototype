@@ -1,67 +1,139 @@
+/* KPICard - Estilo Microsoft Dynamics 365 */
 .kpi-card {
-  flex: 1;
-  min-width: 220px;
-  position: relative;
-  overflow: hidden;
-  transition: all var(--transition-fast);
-  border-left: 4px solid var(--border-color);
+  background: #ffffff;
+  border: 1px solid #edebe9;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.15s, transform 0.15s;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 120px;
 }
 
 .kpi-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.kpi-clickable {
+  cursor: pointer;
+}
+
+.kpi-clickable:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
 }
 
-.kpi-card.border-primary { border-left-color: var(--primary-color); }
-.kpi-card.border-success { border-left-color: var(--success-color); }
-.kpi-card.border-warning { border-left-color: var(--warning-color); }
-.kpi-card.border-error { border-left-color: var(--error-color); }
-
-.kpi-info {
-  flex: 1;
+.kpi-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
 }
 
-.kpi-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
-}
-
-.kpi-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1.2;
-}
-
-.kpi-trend {
-  font-size: 11px;
-  font-weight: 600;
-  margin-top: 4px;
-}
-
-.trend-up { color: var(--success-color); }
-.trend-down { color: var(--error-color); }
-.trend-neutral { color: var(--text-secondary); }
-
-.kpi-icon-container {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+.kpi-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 16px;
+  font-size: 18px;
+  flex-shrink: 0;
+  background: #f3f2f1;
 }
 
-.bg-primary { background-color: var(--primary-light); color: var(--primary-color); }
-.bg-success { background-color: var(--success-light); color: var(--success-color); }
-.bg-warning { background-color: var(--warning-light); color: var(--warning-color); }
-.bg-error { background-color: var(--error-light); color: var(--error-color); }
+.kpi-primary .kpi-icon { background: #DEECF9; color: #0078D4; }
+.kpi-finance .kpi-icon { background: #dff6dd; color: #498205; }
+.kpi-supplychain .kpi-icon { background: #DEECF9; color: #0078D4; }
+.kpi-commerce .kpi-icon { background: #fff4ce; color: #FF8C00; }
+.kpi-project .kpi-icon { background: #fde7e9; color: #8B4513; }
+.kpi-hr .kpi-icon { background: #e8e3ff; color: #7B68EE; }
+.kpi-businesscentral .kpi-icon { background: #d3f0ec; color: #008272; }
+.kpi-success .kpi-icon { background: #dff6dd; color: #107C10; }
+.kpi-warning .kpi-icon { background: #fff4ce; color: #8a6914; }
+.kpi-error .kpi-icon { background: #fde7e9; color: #d13438; }
 
-.kpi-icon {
-  font-size: 20px;
+.kpi-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.kpi-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #605e5c;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.kpi-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #8a8886;
+  font-weight: 400;
+}
+
+.kpi-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kpi-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.kpi-value {
+  font-size: 32px;
+  font-weight: 600;
+  color: #323130;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  font-family: 'Segoe UI Semibold', 'Segoe UI', sans-serif;
+}
+
+.kpi-unit {
+  font-size: 16px;
+  color: #605e5c;
+  font-weight: 400;
+}
+
+.kpi-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.kpi-trend-icon {
+  font-size: 12px;
+}
+
+.kpi-trend-success {
+  background: #dff6dd;
+  color: #107C10;
+}
+
+.kpi-trend-error {
+  background: #fde7e9;
+  color: #d13438;
+}
+
+.kpi-trend-neutral {
+  background: #f3f2f1;
+  color: #605e5c;
+}
+
+.kpi-trend-label {
+  color: #605e5c;
+  font-weight: 400;
+  margin-left: 2px;
 }

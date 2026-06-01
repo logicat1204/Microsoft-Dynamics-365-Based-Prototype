@@ -1,213 +1,273 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import KPICard from '../components/KPICard';
+import CopilotPanel from '../components/CopilotPanel';
+import { useAuth } from '../contexts/AuthContext';
 import { financeApi } from '../services/api';
 import './Home.css';
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [stats, setStats] = useState({
-    totalAssets: 500000,
-    totalLiabilities: 65000,
-    totalRevenue: 350000,
-    pendingReceivables: 45500,
-    pendingPayables: 20000
+    totalAssets: 4055678,
+    totalLiabilities: 1245678,
+    totalRevenue: 4055678,
+    pendingReceivables: 248500,
+    pendingPayables: 156200,
+    growthTarget: 12,
+    grossMargin: 45,
+    openExceptions: 5,
   });
 
-  const [copilotPrompt, setCopilotPrompt] = useState("");
-  const [copilotResponse, setCopilotResponse] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [copilotOpen, setCopilotOpen] = useState(false);
 
   useEffect(() => {
     financeApi.getDashboard()
-      .then(res => setStats(res))
-      .catch(err => console.error("Error loading dashboard metrics:", err));
+      .then(res => setStats((prev) => ({ ...prev, ...res })))
+      .catch(err => console.error('Error loading dashboard metrics:', err));
   }, []);
 
-  const handleCopilotSubmit = (e) => {
-    e.preventDefault();
-    if (!copilotPrompt.trim()) return;
-
-    setLoading(true);
-    setCopilotResponse("");
-
-    setTimeout(() => {
-      const promptLower = copilotPrompt.toLowerCase();
-      let reply = "";
-
-      if (promptLower.includes('concili') || promptLower.includes('reconcil')) {
-        reply = "🤖 **Copilot Conciliador:** He analizado los extractos bancarios cargados en el sistema contra el libro mayor de Contabilidad. He encontrado un 98% de coincidencia exacta. Recomiendo conciliar automáticamente 12 transacciones de clientes y he marcado 2 discrepancias menores de comisiones bancarias para su revisión manual.";
-      } else if (promptLower.includes('riesgo') || promptLower.includes('pago') || promptLower.includes('predecir')) {
-        reply = "🤖 **Copilot Predictivo:** Basado en el historial de pagos de facturas de clientes, estimo un riesgo moderado en el cliente *Tech Solutions* con un retraso promedio de 12 días en sus últimas 3 transacciones. El flujo de caja para el próximo mes se mantendrá positivo con una holgura de $45,000 USD.";
-      } else if (promptLower.includes('inventario') || promptLower.includes('stock') || promptLower.includes('abastec')) {
-        reply = "🤖 **Copilot Cadena de Suministro:** Se detecta una tendencia de aumento en la demanda de *Widget A* para los próximos 30 días. El punto de pedido actual es de 200 unidades, pero recomiendo incrementarlo a 280 unidades para evitar quiebres de stock. He preparado un borrador de Orden de Compra (PO-2026-004) para aprobación.";
-      } else {
-        reply = "🤖 **Copilot Dynamics:** ¡Hola! Puedo ayudarte a realizar conciliaciones automáticas, resumir el estado financiero general, predecir el flujo de efectivo y riesgo de impago, o generar alertas de reabastecimiento de inventario. Intenta preguntarme sobre: *'¿Cómo está el riesgo de impago de clientes?'* o *'Realizar conciliación bancaria'* o *'Analizar inventario y reabastecimiento'*.";
-      }
-
-      setCopilotResponse(reply);
-      setLoading(false);
-    }, 1000);
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
   };
 
-  const erpModules = [
-    {
-      title: "Finance",
-      desc: "Contabilidad general, cuentas por cobrar/pagar, presupuestos, flujo de caja, activos fijos y conciliaciones.",
-      icon: "💰",
-      path: "/finance",
-      color: "#0078d4"
-    },
-    {
-      title: "Supply Chain",
-      desc: "Gestión de almacenes (WMS), inventarios en tiempo real, planificación MRP, compras y mantenimiento.",
-      icon: "📦",
-      path: "/supplychain",
-      color: "#107c41"
-    },
-    {
-      title: "Commerce",
-      desc: "Administración omnicanal de retail, catálogos centralizados, POS físico, precios dinámicos y BOPIS.",
-      icon: "🛒",
-      path: "/commerce",
-      color: "#d83b01"
-    },
-    {
-      title: "Project Operations",
-      desc: "Planificación con Gantt, asignación de recursos, hojas de tiempos, facturación por hitos y contratos.",
-      icon: "📊",
-      path: "/project",
-      color: "#8764eb"
-    },
-    {
-      title: "Human Resources",
-      desc: "Expedientes de empleados, compensaciones, licencias, organigrama, reclutamiento y evaluaciones.",
-      icon: "👥",
-      path: "/hr",
-      color: "#00b7c3"
-    },
-    {
-      title: "Business Central",
-      desc: "ERP todo en uno para PYMEs con finanzas avanzadas, CRM integrado, logística y planificación de fabricación.",
-      icon: "🏢",
-      path: "/businesscentral",
-      color: "#eae034"
-    }
+  const formatNumber = (value) => {
+    return new Intl.NumberFormat('en-US').format(value);
+  };
+
+  // Top 5 customers data
+  const topCustomers = [
+    { name: 'Contoso Corp', revenue: 485230, percentage: 100 },
+    { name: 'Adventure Works', revenue: 412890, percentage: 85 },
+    { name: 'Fabrikam Inc.', revenue: 356100, percentage: 73 },
+    { name: 'Northwind Traders', revenue: 298450, percentage: 61 },
+    { name: 'Wide World Importers', revenue: 245670, percentage: 51 },
   ];
 
+  // Revenue by initiative
+  const revenueByInitiative = [
+    { month: 'Ene', value: 320 },
+    { month: 'Feb', value: 280 },
+    { month: 'Mar', value: 380 },
+    { month: 'Abr', value: 350 },
+    { month: 'May', value: 420 },
+    { month: 'Jun', value: 480 },
+    { month: 'Jul', value: 510 },
+  ];
+  const maxRevenue = Math.max(...revenueByInitiative.map(r => r.value));
+
+  // Tasks by status
+  const tasksByStatus = [
+    { status: 'Completadas', count: 45, color: '#107C10' },
+    { status: 'En progreso', count: 28, color: '#0078D4' },
+    { status: 'Pendientes', count: 15, color: '#FFB900' },
+    { status: 'Bloqueadas', count: 5, color: '#d13438' },
+  ];
+  const totalTasks = tasksByStatus.reduce((sum, t) => sum + t.count, 0);
+
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <h1>Dashboard General ERP</h1>
-        <p className="page-description">Vista unificada de la suite de aplicaciones de planeación de recursos empresariales (ERP) de Microsoft Dynamics 365.</p>
+    <div className="home-dashboard">
+      {/* Header de bienvenida */}
+      <div className="dashboard-header">
+        <div>
+          <h1>Bienvenido, {user?.name?.split(' ')[0] || 'Usuario'}</h1>
+          <p className="dashboard-subtitle">
+            Aquí tienes un resumen de tu entorno Dynamics 365
+          </p>
+        </div>
+        <div className="dashboard-actions">
+          <button
+            className="copilot-action-btn"
+            onClick={() => setCopilotOpen(true)}
+          >
+            <span>✨</span> Ask Copilot
+          </button>
+        </div>
       </div>
 
+      {/* KPIs principales */}
       <div className="kpi-grid">
-        <KPICard 
-          title="Activos Totales" 
-          value={`$${stats.totalAssets.toLocaleString('es-BO', { minimumFractionDigits: 2 })}`}
-          icon="🏦" 
-          trend="Incremento estable" 
-          trendType="up"
-          color="primary"
+        <KPICard
+          title="Gross Revenue"
+          value={formatCurrency(stats.totalRevenue)}
+          unit="USD"
+          trend={12.3}
+          trendLabel="vs Q4 anterior"
+          icon="💰"
+          color="finance"
         />
-        <KPICard 
-          title="Ingresos Registrados" 
-          value={`$${stats.totalRevenue.toLocaleString('es-BO', { minimumFractionDigits: 2 })}`}
-          icon="📈" 
-          trend="Metas del trimestre al 85%" 
-          trendType="up"
+        <KPICard
+          title="Net Income Growth"
+          value={`${stats.growthTarget}%`}
+          subtitle="Target PY"
+          trend={3.2}
+          trendLabel="vs meta"
+          icon="📈"
           color="success"
         />
-        <KPICard 
-          title="Por Cobrar (Pendiente)" 
-          value={`$${stats.pendingReceivables.toLocaleString('es-BO', { minimumFractionDigits: 2 })}`}
-          icon="⏳" 
-          trend="3 clientes con retraso" 
-          trendType="down"
+        <KPICard
+          title="Gross Margin"
+          value={`${stats.grossMargin}%`}
+          subtitle="Target"
+          trend={-1.5}
+          trendLabel="vs mes anterior"
+          icon="📊"
           color="warning"
         />
-        <KPICard 
-          title="Por Pagar (Pendiente)" 
-          value={`$${stats.pendingPayables.toLocaleString('es-BO', { minimumFractionDigits: 2 })}`}
-          icon="📉" 
-          trend="Vence en 15 días" 
-          trendType="neutral"
+        <KPICard
+          title="Open Exceptions"
+          value={stats.openExceptions}
+          subtitle="Requieren atención"
+          trend={-2}
+          trendLabel="esta semana"
+          icon="⚠️"
           color="error"
         />
       </div>
 
-      <div className="home-layout flex gap-lg">
-        {/* Main Section: ERP Modules */}
-        <div className="main-section flex flex-col gap-md">
-          <h2 className="section-title">Módulos ERP Dynamics 365</h2>
-          <div className="modules-grid">
-            {erpModules.map((mod, idx) => (
-              <div 
-                key={idx} 
-                className="module-card card flex flex-col justify-between"
-                onClick={() => navigate(mod.path)}
-                style={{ borderTop: `4px solid ${mod.color}` }}
-              >
-                <div className="module-card-header flex justify-between align-center">
-                  <span className="module-icon" style={{ backgroundColor: `${mod.color}15`, color: mod.color }}>
-                    {mod.icon}
-                  </span>
-                  <span className="arrow-icon">➔</span>
+      {/* Sección de gráficos */}
+      <div className="charts-grid">
+        {/* Top 5 Customers - Barras horizontales */}
+        <div className="card chart-card">
+          <div className="card-header">
+            <h3 className="card-title">TOP 5 Customers</h3>
+            <button className="link-button">Learn more →</button>
+          </div>
+          <div className="top-customers">
+            {topCustomers.map((customer, i) => (
+              <div key={i} className="customer-bar">
+                <div className="customer-info">
+                  <span className="customer-name">{customer.name}</span>
+                  <span className="customer-revenue">{formatCurrency(customer.revenue)}</span>
                 </div>
-                <div className="module-card-body">
-                  <h4>{mod.title}</h4>
-                  <p>{mod.desc}</p>
+                <div className="bar-container">
+                  <div
+                    className="bar-fill"
+                    style={{ width: `${customer.percentage}%` }}
+                  ></div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Sidebar Section: Copilot Assistant */}
-        <div className="copilot-sidebar card flex flex-col">
-          <div className="copilot-sidebar-header flex align-center gap-sm">
-            <span className="copilot-sparkle-large">✨</span>
-            <div>
-              <h3>Microsoft Copilot</h3>
-              <span className="copilot-sub">Asistente Inteligente de ERP</span>
+        {/* Revenue by initiative - Barras verticales */}
+        <div className="card chart-card">
+          <div className="card-header">
+            <h3 className="card-title">Revenue by initiative</h3>
+            <select className="period-selector">
+              <option>Last 7 months</option>
+              <option>Last 12 months</option>
+              <option>Year to date</option>
+            </select>
+          </div>
+          <div className="vertical-chart">
+            {revenueByInitiative.map((item, i) => (
+              <div key={i} className="v-chart-item">
+                <div className="v-chart-bar-container">
+                  <div
+                    className="v-chart-bar"
+                    style={{ height: `${(item.value / maxRevenue) * 100}%` }}
+                  >
+                    <span className="v-chart-value">{item.value}K</span>
+                  </div>
+                </div>
+                <span className="v-chart-label">{item.month}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Tasks by Status - Dona */}
+        <div className="card chart-card">
+          <div className="card-header">
+            <h3 className="card-title">Tasks by Status</h3>
+            <button className="link-button">Ver todas →</button>
+          </div>
+          <div className="donut-chart-wrapper">
+            <svg viewBox="0 0 100 100" className="donut-chart">
+              {(() => {
+                let cumulativePercent = 0;
+                return tasksByStatus.map((task, i) => {
+                  const percent = (task.count / totalTasks) * 100;
+                  const offset = 25 - cumulativePercent * 0.25;
+                  cumulativePercent += percent;
+                  return (
+                    <circle
+                      key={i}
+                      cx="50"
+                      cy="50"
+                      r="15.915"
+                      fill="transparent"
+                      stroke={task.color}
+                      strokeWidth="10"
+                      strokeDasharray={`${percent} ${100 - percent}`}
+                      strokeDashoffset={offset}
+                    />
+                  );
+                });
+              })()}
+              <text x="50" y="50" textAnchor="middle" dy="0.35em" className="donut-text">
+                {totalTasks}
+              </text>
+            </svg>
+            <div className="donut-legend">
+              {tasksByStatus.map((task, i) => (
+                <div key={i} className="legend-item">
+                  <span className="legend-dot" style={{ backgroundColor: task.color }}></span>
+                  <div>
+                    <strong>{task.status}</strong>
+                    <small>{task.count} tareas</small>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-          
-          <div className="copilot-chat flex-col flex">
-            {copilotResponse ? (
-              <div className="chat-bubble received">
-                <div className="bubble-content" dangerouslySetInnerHTML={{ __html: copilotResponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
-              </div>
-            ) : (
-              <div className="copilot-placeholder text-center flex flex-col align-center justify-center">
-                <span className="placeholder-icon">🤖</span>
-                <p>Pregúntame sobre conciliaciones bancarias, riesgo de impago de clientes o planificación de inventario.</p>
-              </div>
-            )}
-            
-            {loading && (
-              <div className="chat-bubble received loading-bubble">
-                <div className="dot-flashing"></div>
-              </div>
-            )}
-          </div>
-
-          <form onSubmit={handleCopilotSubmit} className="copilot-input-group flex gap-sm">
-            <input 
-              type="text" 
-              placeholder="Preguntar a Copilot..." 
-              value={copilotPrompt}
-              onChange={(e) => setCopilotPrompt(e.target.value)}
-              disabled={loading}
-              className="copilot-input"
-            />
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              Enviar
-            </button>
-          </form>
         </div>
       </div>
+
+      {/* Accesos rápidos a módulos */}
+      <div className="card">
+        <div className="card-header">
+          <h3 className="card-title">Accesos rápidos</h3>
+        </div>
+        <div className="module-quick-access">
+          {[
+            { path: '/finance', name: 'Finance', icon: '💰', color: '#498205', desc: 'Contabilidad, tesorería, conciliación' },
+            { path: '/supplychain', name: 'Supply Chain', icon: '📦', color: '#0078D4', desc: 'Inventarios, almacenes, MRP' },
+            { path: '/commerce', name: 'Commerce', icon: '🛒', color: '#FF8C00', desc: 'POS, e-commerce, promociones' },
+            { path: '/project', name: 'Project Operations', icon: '📊', color: '#8B4513', desc: 'Proyectos, recursos, tiempos' },
+            { path: '/hr', name: 'Human Resources', icon: '👥', color: '#7B68EE', desc: 'Empleados, nómina, evaluaciones' },
+            { path: '/businesscentral', name: 'Business Central', icon: '🏢', color: '#008272', desc: 'ERP integral para PYME' },
+          ].map((module) => (
+            <button
+              key={module.path}
+              className="module-access-card"
+              onClick={() => navigate(module.path)}
+              style={{ '--module-color': module.color }}
+            >
+              <div className="module-access-icon">{module.icon}</div>
+              <div className="module-access-info">
+                <h4>{module.name}</h4>
+                <p>{module.desc}</p>
+              </div>
+              <span className="module-access-arrow">→</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Copilot Panel */}
+      <CopilotPanel
+        isOpen={copilotOpen}
+        onClose={() => setCopilotOpen(false)}
+      />
     </div>
   );
 };
