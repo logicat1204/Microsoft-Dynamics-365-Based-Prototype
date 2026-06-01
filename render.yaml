@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: sis315-dynamics365
+    name: sis315-dynamics365-prototype
     env: node
     plan: free
-    buildCommand: "rm -rf backend/node_modules frontend/node_modules && cd backend && npm install --build-from-source && cd ../frontend && npm install --include=dev && node ./node_modules/vite/bin/vite.js build"
+    buildCommand: "rm -rf backend/node_modules backend/package-lock.json frontend/node_modules frontend/package-lock.json && cd backend && npm install && npm rebuild better-sqlite3 --build-from-source && cd ../frontend && npm install --include=dev && node ./node_modules/vite/bin/vite.js build"
     startCommand: "cd backend && node server.js"
     envVars:
       - key: NODE_ENV
