@@ -3,10 +3,8 @@ services:
     name: sis315-dynamics365
     env: node
     plan: free
-    buildCommand: "cd backend && npm install && npm run build-frontend"
+    buildCommand: "cd backend && npm install && cd ../frontend && npm install --include=dev && npm run build"
     startCommand: "cd backend && npm start"
     envVars:
-      - key: PORT
-        value: 5000
       - key: NODE_ENV
         value: production
