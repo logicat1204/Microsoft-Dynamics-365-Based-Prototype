@@ -1,0 +1,137 @@
+.data-table-container {
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  margin-bottom: 24px;
+}
+
+.table-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-title-group h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.table-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.search-input {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  width: 240px;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.search-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+/* Button styles */
+.btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.btn:hover {
+  background-color: var(--bg-color);
+  border-color: var(--border-hover);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.btn-icon-only {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  transition: background-color var(--transition-fast);
+}
+
+.btn-icon-only:hover {
+  background-color: var(--bg-color);
+}
+
+.btn-icon-only.edit:hover {
+  background-color: var(--primary-light);
+}
+
+.btn-icon-only.delete:hover {
+  background-color: var(--error-light);
+}
+
+/* Table wrapper and actual table styles */
+.table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.data-table th {
+  background-color: #faf9f8;
+  color: var(--text-secondary);
+  font-weight: 600;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border-color);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.data-table td {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.data-table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.data-table tbody tr:hover {
+  background-color: #f3f2f1;
+}
+
+.actions-cell {
+  text-align: center;
+}
+
+.no-data {
+  padding: 32px !important;
+  color: var(--text-secondary);
+  font-style: italic;
+}
