@@ -3,7 +3,7 @@ services:
     name: sis315-dynamics365
     env: node
     plan: free
-    buildCommand: "cd backend && npm install && cd ../frontend && npm install --include=dev && node ./node_modules/vite/bin/vite.js build"
+    buildCommand: "cd backend && npm install --build-from-source && cd ../frontend && npm install --include=dev && node ./node_modules/vite/bin/vite.js build"
     startCommand: "cd backend && npm start"
     envVars:
       - key: NODE_ENV
