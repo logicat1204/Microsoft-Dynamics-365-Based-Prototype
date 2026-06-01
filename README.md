@@ -1,88 +1,73 @@
-# SIS315-Prototipo Microsoft Dynamics 365
+# SIS315 - Prototipo Microsoft Dynamics 365
 
-A web application clone based on Microsoft Dynamics 365 ERP modules.
+## Introducción
 
-## Project Structure
+Microsoft Dynamics 365 es una suite de aplicaciones empresariales que combina funcionalidades de **ERP (Planificación de Recursos Empresariales)** y **CRM (Gestión de Relaciones con Clientes)**. Los módulos ERP se centran en la gestión integrada de procesos clave como finanzas, cadena de suministro, operaciones de proyectos, recursos humanos, comercio y fabricación.
 
-- ackend/ - Node.js/Express server with MongoDB
-- rontend/ - React application with Vite
+Este prototipo implementa exclusivamente los **módulos orientados a ERP** de Dynamics 365. Cada uno de estos módulos incluye, a su vez, **submódulos propios del ámbito ERP** (por ejemplo, dentro de Finanzas se encuentran el libro mayor, cuentas por pagar, gestión de efectivo, etc.). Por lo tanto, el proyecto cubre un amplio espectro de funcionalidades empresariales típicas de un sistema ERP.
 
-## Features
+## Descripción del Proyecto
 
-This prototype includes clones of the following Dynamics 365 ERP modules:
+Prototipo de una aplicación web basada en los módulos ERP de Microsoft Dynamics 365.
 
-1. **Finance Dynamics 365** - General ledger, accounts payable/receivable, budgeting, cash flow, fixed assets, bank reconciliation, multi-currency support
-2. **Supply Chain Management** - Warehouse management, inventory control, MRP, purchasing, quality control, asset maintenance, demand forecasting
-3. **Commerce** - POS, product catalog, pricing/promotions, inventory synchronization, BOPIS, loyalty programs, payment gateway integration
-4. **Project Operations** - Project planning with Gantt charts, resource allocation, timesheets, project budgeting, invoicing, contract management, profitability tracking
-5. **Human Resources** - Employee records, compensation/benefits, time off/attendance, self-service portal, organizational structure, recruitment/onboarding, performance evaluations
-6. **Business Central** - Advanced financial management, CRM, supply chain management, project/service management, manufacturing/production planning
+## Estructura del Proyecto
 
-## Setup Instructions
+- **Backend/** - Servidor con Node.js/Express y MongoDB
+- **Frontend/** - Aplicación React con Vite
+
+## Características
+
+Este prototipo incluye clones de los siguientes módulos ERP de Dynamics 365:
+
+- **Finanzas Dynamics 365** - Libro mayor, cuentas por pagar y cobrar, presupuestos, flujo de caja, activos fijos, conciliación bancaria, soporte multimoneda.
+- **Gestión de la Cadena de Suministro** - Gestión de almacenes, control de inventarios, MRP (Planificación de Necesidades de Materiales), compras, control de calidad, mantenimiento de activos, previsión de demanda.
+- **Comercio** - Punto de venta (POS), catálogo de productos, precios y promociones, sincronización de inventario, compra online y recogida en tienda (BOPIS), programas de fidelización, integración con pasarelas de pago.
+- **Operaciones de Proyectos** - Planificación de proyectos con diagramas de Gantt, asignación de recursos, hojas de tiempos, presupuestación de proyectos, facturación, gestión de contratos, seguimiento de rentabilidad.
+- **Recursos Humanos** - Registros de empleados, compensaciones y beneficios, vacaciones y asistencia, portal de autoservicio, estructura organizativa, reclutamiento e incorporación, evaluaciones de desempeño.
+- **Business Central** - Gestión financiera avanzada, CRM, gestión de la cadena de suministro, gestión de proyectos y servicios, planificación de producción y fabricación.
+
+## Instrucciones de Configuración
 
 ### Backend
 
-1. Navigate to the backend directory:
-   `
-   cd backend
-   `
-
-2. Install dependencies:
-   `
-   npm install
-   `
-
-3. Start the server:
-   `
-   npm start
-   `
+1. Navega al directorio `backend`:  
+   `cd backend`
+2. Instala las dependencias:  
+   `npm install`
+3. Inicia el servidor:  
+   `npm start`
 
 ### Frontend
 
-1. Navigate to the frontend directory:
-   `
-   cd frontend
-   `
+1. Navega al directorio `frontend`:  
+   `cd frontend`
+2. Instala las dependencias:  
+   `npm install`
+3. Inicia el servidor de desarrollo:  
+   `npm run dev`
 
-2. Install dependencies:
-   `
-   npm install
-   `
+## Despliegue en Render
 
-3. Start the development server:
-   `
-   npm run dev
-   `
+Esta aplicación está configurada para desplegarse en **Render** usando el plan gratuito:
 
-## Deployment to Render
+1. Simplemente importar como blueprint en render.
 
-This application is configured for deployment on Render with the free tier:
+## Tecnologías Utilizadas
 
-1. Create a new Web Service on Render
-2. Connect your GitHub repository
-3. Set the build command to: 
-pm install && cd frontend && npm install && npm run build
-4. Set the start command to: cd backend && npm start
-5. Add environment variables:
-   - PORT: 5000 (or leave blank for default)
-   - MONGODB_URI: Your MongoDB connection string
+- **Backend:** Node.js, Express, MongoDB, Mongoose
+- **Frontend:** React, React Router, Vite
+- **Estilos:** CSS
+- **Base de datos:** MongoDB (reemplazable por cualquier base de datos compatible)
 
-## Technology Stack
+## Endpoints de la API
 
-- **Backend**: Node.js, Express, MongoDB/Mongoose
-- **Frontend**: React, React Router, Vite
-- **Styling**: CSS
-- **Database**: MongoDB (can be replaced with any compatible database)
+La API sigue las convenciones REST con las siguientes rutas base:
 
-## API Endpoints
+- `/api/finance` - Endpoints del módulo de Finanzas
+- `/api/supplychain` - Endpoints de Gestión de la Cadena de Suministro
+- `/api/commerce` - Endpoints del módulo de Comercio
+- `/api/project` - Endpoints de Operaciones de Proyectos
+- `/api/hr` - Endpoints de Recursos Humanos
+- `/api/businesscentral` - Endpoints de Business Central
 
-The API follows REST conventions with the following base paths:
-- /api/finance - Finance module endpoints
-- /api/supplychain - Supply Chain Management endpoints
-- /api/commerce - Commerce module endpoints
-- /api/project - Project Operations endpoints
-- /api/hr - Human Resources endpoints
-- /api/businesscentral - Business Central endpoints
-
-Each module has CRUD endpoints for its respective entities.
-
+Cada módulo dispone de endpoints CRUD para sus respectivas entidades.
