@@ -93,8 +93,8 @@ function App() {
             </ProtectedRoute>
           } />
 
-          {/* Ruta catch-all - redirige al home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Ruta catch-all - redirige segun autenticacion */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

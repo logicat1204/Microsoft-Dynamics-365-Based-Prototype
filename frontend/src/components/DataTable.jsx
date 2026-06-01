@@ -126,8 +126,8 @@ const DataTable = ({
                   </th>
                 )}
                 {columns.map((col) => (
-                  <th key={col.key} style={col.width ? { width: col.width } : {}}>
-                    {col.label}
+                  <th key={col.accessor || col.key} style={col.width ? { width: col.width } : {}}>
+                    {col.header || col.label}
                   </th>
                 ))}
               </tr>
@@ -148,11 +148,14 @@ const DataTable = ({
                       />
                     </td>
                   )}
-                  {columns.map((col) => (
-                    <td key={col.key}>
-                      {col.render ? col.render(row[col.key], row) : row[col.key]}
-                    </td>
-                  ))}
+                  {columns.map((col) => {
+                    const key = col.accessor || col.key;
+                    return (
+                      <td key={key}>
+                        {col.cell ? col.cell(row) : col.render ? col.render(row[key], row) : row[key]}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
